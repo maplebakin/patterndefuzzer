@@ -1,55 +1,76 @@
-// frontend/src/pages/Home.jsx
 import { useState } from 'react';
-import axios from 'axios';
+import './Home.css'; // optional if you want custom styles
 
 export default function Home() {
   const [url, setUrl] = useState('');
-  const [result, setResult] = useState(null);
+  const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleDefuzz = async () => {
+  const handleScrape = async () => {
+    if (!url.trim()) return;
     setLoading(true);
+    setOutput('');
     setError('');
-    setResult(null);
+
     try {
-      const response = await axios.post('http://localhost:3000/api/scrape', { url });
-      setResult(response.data);
+      const res = await fetch('http://localhost:3000/api/patterns/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setOutput(data.data);
+      } else {
+        setError(data.error || 'Something went wrong.');
+      }
     } catch (err) {
-      setError('Something went wrong while fetching the pattern.');
+      setError('Failed to connect to the server.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="home-container" style={{ padding: '2rem', fontFamily: 'serif' }}>
-      <h1>🧵 Pattern Defuzzer</h1>
-      <p>Paste a crochet pattern URL below to begin defuzzing:</p>
+    <div className="home-container" style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
+      <h1>🧶 Pattern Defuzzer</h1>
+      <p>Paste a pattern URL and get the cozy version ✨</p>
+
       <input
         type="text"
+        placeholder="https://www.garnstudio.com/pattern.php?id=..."
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://example.com/my-pattern"
         style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
       />
-      <button onClick={handleDefuzz} disabled={loading || !url.trim()}>
-        {loading ? 'Defuzzing...' : 'Defuzz Pattern'}
+
+      <button
+        onClick={handleScrape}
+        disabled={loading}
+        style={{ padding: '0.5rem 1rem', cursor: loading ? 'wait' : 'pointer' }}
+      >
+        {loading ? 'Defuzzing...' : 'Fetch Pattern'}
       </button>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p style={{ color: 'crimson', marginTop: '1rem' }}>⚠️ {error}</p>}
 
-      {result && (
-        <div style={{ marginTop: '2rem', whiteSpace: 'pre-wrap', background: '#f9f9f9', padding: '1rem' }}>
-          <h2>🧶 Defuzzed Output</h2>
-          <p><strong>Title:</strong> {result.title}</p>
-          <p><strong>Source:</strong> <a href={result.source} target="_blank" rel="noreferrer">{result.source}</a></p>
-          <p><strong>Yarn:</strong> {result.yarn}</p>
-          <p><strong>Hook Size:</strong> {result.hookSize}</p>
-          <pre style={{ background: '#fff', padding: '1rem', border: '1px solid #ccc' }}>
-{result.formatted}
-          </pre>
-        </div>
+      {output && (
+        <pre
+          style={{
+            background: '#fdf6f0',
+            border: '1px solid #ddd',
+            padding: '1rem',
+            whiteSpace: 'pre-wrap',
+            marginTop: '2rem',
+          }}
+        >
+          {output}
+        </pre>
       )}
     </div>
   );

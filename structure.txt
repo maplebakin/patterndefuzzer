@@ -1,0 +1,41 @@
+.
+├── backend
+│   ├── .env
+│   ├── .gitkeep
+│   ├── index.js
+│   ├── models
+│   │   └── DefuzzedPattern.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── routes
+│   ├── scrapers
+│   │   ├── scrapeAllFreeCrochet.js
+│   │   ├── scrapeGarnstudio.js
+│   │   └── scrapeZamiguz.js
+│   └── utils
+│       └── formatPatternOutput.js
+├── frontend
+│   ├── eslint.config.js
+│   ├── .gitignore
+│   ├── .gitkeep
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   ├── README.md
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── assets
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   └── pages
+│   │       └── Home.jsx
+│   └── vite.config.js
+├── index.js
+├── package.json
+├── package-lock.json
+├── routes.js
+└── structure.txt
+
+10 directories, 28 files

@@ -1,0 +1,54 @@
+.home-container {
+  font-family: 'Georgia', 'Libre Baskerville', serif;
+  background-color: #fefcf8;
+  color: #3b2f2f;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(60, 40, 20, 0.1);
+  padding: 2rem;
+  margin-top: 4rem;
+  transition: all 0.3s ease;
+}
+
+.home-container h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #6b4b3e;
+}
+
+.home-container p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: #594d45;
+}
+
+.home-container input[type="text"] {
+  border: 1px solid #d7ccc8;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.home-container button {
+  background-color: #e0cfc1;
+  color: #3b2f2f;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.home-container button:hover {
+  background-color: #d5bfb0;
+}
+
+.home-container pre {
+  background: #f9f4f0;
+  border-left: 4px solid #cba88d;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  border-radius: 6px;
+}

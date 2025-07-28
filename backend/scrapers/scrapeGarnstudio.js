@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { load } from 'cheerio';
 
-export async function scrapeGarnstudio(url) {
+export default scrapeGarnstudio;
+async function scrapeGarnstudio(url) {
   try {
     const { data: html } = await axios.get(url);
     const $ = load(html);
@@ -28,14 +29,13 @@ export async function scrapeGarnstudio(url) {
     let patternInstructions = '';
     let assemblyInstructions = '';
 
-    // Find "START THE PIECE HERE" to isolate pattern
     const startSplit = raw.split(/START THE PIECE HERE:/i);
     if (startSplit.length > 1) {
       patternInstructions = startSplit[1].split(/(?:ASSEMBLY|TWISTED CORD|CROCHET EDGE):/i)[0].trim();
       assemblyInstructions = raw.split(/(?:ASSEMBLY|TWISTED CORD|CROCHET EDGE):/i).slice(1).join('\n\n').trim();
     } else {
-      // fallback if split fails
       patternInstructions = raw;
+      assemblyInstructions = 'Not found';
     }
 
     return {
@@ -43,10 +43,11 @@ export async function scrapeGarnstudio(url) {
       source: url,
       yarn,
       hookSize,
-      formatted: `Title: ${pageTitle}\nSource: ${url}\nYarn: ${yarn}\nHook Size: ${hookSize}\n\n🧶 Pattern Instructions\n${patternInstructions}\n\n🪡 Assembly Instructions\n${assemblyInstructions}`
+      patternSteps: patternInstructions || 'Not found',
+      assembly: assemblyInstructions || 'Not found',
     };
   } catch (err) {
     console.error('❌ Garnstudio scrape failed:', err.message);
-    return { error: 'Failed to scrape Garnstudio page' };
+    throw new Error('Failed to scrape Garnstudio page');
   }
 }
