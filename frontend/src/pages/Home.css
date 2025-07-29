@@ -1,3 +1,4 @@
+/* Main container */
 .home-container {
   font-family: 'Georgia', 'Libre Baskerville', serif;
   background-color: #fefcf8;
@@ -5,35 +6,43 @@
   border-radius: 12px;
   box-shadow: 0 0 12px rgba(60, 40, 20, 0.1);
   padding: 2rem;
-  margin-top: 4rem;
-  transition: all 0.3s ease;
+  margin: 4rem auto;
+  max-width: 720px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Header */
 .home-container h1 {
   font-size: 2rem;
-  margin-bottom: 0.5rem;
-  color: #6b4b3e;
+  margin-bottom: 0.25rem; /* was 0.5rem */
 }
 
 .home-container p {
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
-  color: #594d45;
+  margin-bottom: 1rem; /* was 1.5rem */
 }
 
+
+/* Input */
 .home-container input[type="text"] {
+  width: 100%;
   border: 1px solid #d7ccc8;
   border-radius: 8px;
-  padding: 0.5rem;
+  padding: 0.75rem;
   font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
+/* Button */
 .home-container button {
+  padding: 0.5rem 1.25rem;
   background-color: #e0cfc1;
   color: #3b2f2f;
   border: none;
   border-radius: 8px;
   font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
   transition: background 0.2s ease;
 }
 
@@ -41,14 +50,91 @@
   background-color: #d5bfb0;
 }
 
-.home-container pre {
-  background: #f9f4f0;
-  border-left: 4px solid #cba88d;
-  padding: 1rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.95rem;
+/* Output preview box */
+.preview-box {
+  margin-top: 2rem;
+  background-color: #fff9f9;
+  border-left: 4px solid #e0c3d3;
+  padding: 1.25rem 1rem;
+  border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-wrap: break-word;
   line-height: 1.5;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  border-radius: 6px;
+}
+
+
+/* Checklist container */
+.checklist-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: 'Libre Baskerville', serif;
+}
+
+/* Each row block */
+.row-block {
+  border-top: 1px solid #eee;
+  padding-top: 0.75rem; /* was 1rem */
+  margin-top: 0.75rem;
+}
+
+
+/* Row label + checkbox */
+.row-checkbox input[type="checkbox"] {
+  margin-right: 0.5rem;
+  transform: scale(1.1); /* was 1.2 */
+}
+
+.row-checkbox input[type="checkbox"] {
+  transform: scale(1.1);
+  margin: 0;
+}
+
+/* Row steps */
+.row-steps {
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem; /* was 0.25rem */
+  line-height: 1.4; /* was 1.5 or 1.6 */
+}
+
+
+/* Step lines */
+.step-line {
+  display: flex;
+  align-items: flex-start;
+}
+
+.step-line::before {
+  content: "–";
+  color: #b48ead;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+.meta-line {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #444;
+  padding-left: 0.5rem;
+}
+.preview-box p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.preview-box hr {
+  margin: 0rem 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.pattern-header-line {
+  margin: 0;
+  padding: 0;
+  font-size: 0.95rem;
+  line-height: 1.3;
 }

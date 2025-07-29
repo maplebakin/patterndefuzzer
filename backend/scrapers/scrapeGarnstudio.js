@@ -19,10 +19,12 @@ async function scrapeGarnstudio(url) {
     const pageTitle = $('title').text().trim().replace(/\s\|.*$/, '') || 'Untitled Project';
 
     // Yarn and hook size - try a few phrase options
-    const yarnMatch = raw.match(/(?:with|using)\s+(.*?)\s+(?:and|to work|for the)/i);
+    const yarnMatch = raw.match(/(?:with|using)\s+([^,\.]+)/i);
+    let yarn = yarnMatch ? yarnMatch[1].trim() : 'Not specified';
+    yarn = yarn.replace(/[.,\s]*$/g, '');
     const hookMatch = raw.match(/hook size[:]? (\d+(?:\.\d+)? ?mm)/i);
 
-    const yarn = yarnMatch ? yarnMatch[1].trim() : 'Not specified';
+    
     const hookSize = hookMatch ? hookMatch[1].trim() : 'Not specified';
 
     // Pattern vs assembly split

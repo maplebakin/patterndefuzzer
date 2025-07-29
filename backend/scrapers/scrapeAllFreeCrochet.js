@@ -1,19 +1,16 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-export default scrapeAllFreeCrochet;
-async function scrapeAllFreeCrochet(url) {
+export default async function scrapeAllFreeCrochet(url) {
   const { data } = await axios.get(url);
   const $ = cheerio.load(data);
 
-  const title = $('h1').first().text().trim();
+  const title = $('h1').first().text().trim() || 'Untitled Pattern';
   const source = url;
 
-  // Try to find external pattern link (very common)
+  // External-link check (common on AllFreeCrochet)
   const externalLink = $('a.linkOut')
-    .filter((i, el) =>
-      $(el).text().toLowerCase().includes('click here')
-    )
+    .filter((i, el) => $(el).text().toLowerCase().includes('click here'))
     .attr('href');
 
   if (externalLink) {
@@ -24,23 +21,50 @@ async function scrapeAllFreeCrochet(url) {
       hookSize: 'See external site',
       patternSteps: `Redirected to: ${externalLink}`,
       assembly: 'See external site or not provided',
-      note: 'This pattern lives on an external site. Try scraping that link instead!'
+      note: 'Pattern lives on an external page—try scraping that link.',
     };
   }
 
-  // Fallback if full pattern is embedded (rare)
-  const patternSteps = $('.article-body p, .article-body li')
-    .map((i, el) => $(el).text().trim())
-    .get()
-    .filter(line => line.length > 0)
-    .join('\n\n');
+  // ——— NEW: scrape instructions from structured <div class="sections"> layout ———
+  const sections = [];
+
+  $('div.sections > div.section').each((_, sec) => {
+    const header = $(sec).find('h4').first().text().trim();
+
+    // ❌ Skip non-pattern fluff sections
+    if (/pdf|download|how to print/i.test(header)) return;
+
+    const lines = [];
+
+    // ✅ Grab <p> and <li><p> under the section
+    $(sec)
+      .find('.articleAttrSection p, ol.cells li.decimal p')
+      .each((_, el) => {
+        const txt = $(el).text().trim();
+        if (
+          txt &&
+          !txt.toLowerCase().includes('click here') &&
+          !/^https?:\/\//.test(txt)
+        ) {
+          lines.push(txt);
+        }
+      });
+
+    if (lines.length) {
+      sections.push([header, ...lines].join('\n'));
+    }
+  });
+
+  const patternSteps = sections.length
+    ? sections.join('\n\n')
+    : 'No steps found in expected layout.';
 
   return {
     title,
     source,
     yarn: 'Not specified',
     hookSize: 'Not specified',
-    patternSteps: patternSteps || 'No steps found, and no external link was detected.',
-    assembly: 'Not specified'
+    patternSteps,
+    assembly: 'Not specified',
   };
 }
