@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './Home.css';
 
+
 export default function Home() {
   const [url, setUrl] = useState('');
   const [output, setOutput] = useState('');
@@ -53,6 +54,7 @@ export default function Home() {
       {error && <p style={{ color: 'crimson', marginTop: '1rem' }}>⚠️ {error}</p>}
 
       {output && (
+        <div className="card">
         <div className="preview-box checklist-box">
           {/* Split lines into header + content */}
           {(() => {
@@ -108,12 +110,14 @@ export default function Home() {
   );
 }
 
+
+
                   return <p key={idx} style={{ margin: '0rem 0px' }}>{line}</p>;
                 })}
               </>
             );
           })()}
-        </div>
+        </div></div>
       )}
     </div>
   );
