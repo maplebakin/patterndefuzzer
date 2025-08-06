@@ -1,5 +1,16 @@
-export function formatPatternOutput({ title, source, yarn, hookSize, patternSteps, assembly }) {
-  const cleanSteps = patternSteps
+// backend/utils/formatPatternOutput.js
+
+export function formatPatternOutput({
+  title = 'Untitled Pattern',
+  source = 'Not specified',
+  yarn = 'Not specified',
+  hookSize = 'Not specified',
+  instructions = '',
+  patternSteps = '',
+  assembly = ''
+}) {
+  const baseInstructions = instructions || patternSteps || 'No instructions found.';
+  const cleanSteps = baseInstructions
     .split('\n')
     .map(line => {
       if (/^Now work pattern as follows:/i.test(line)) {
@@ -25,11 +36,11 @@ export function formatPatternOutput({ title, source, yarn, hookSize, patternStep
 🧶 Pattern Instructions
 ━━━━━━━━━━━━━━━━━━━━━━
 
-${cleanSteps || 'No instructions found.'}
+${cleanSteps}
 
 ━━━━━━━━━━━━━━━━━━━━━━
 🪡 Assembly Instructions
 ━━━━━━━━━━━━━━━━━━━━━━
 
-${assembly.trim() || 'Not specified.'}`;
+${assembly?.trim() || 'Not specified.'}`;
 }

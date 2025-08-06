@@ -5,7 +5,7 @@
   color: #3b2f2f;
   border-radius: 16px;
   box-shadow: 0 0 20px rgba(60, 40, 20, 0.1);
-  padding: 4rem 5vw; /* generous padding with viewport width scaling */
+  padding: 4rem 5vw;
   margin: 2rem 0;
   width: 100%;
   max-width: none;
@@ -26,7 +26,6 @@
   font-size: 1.2rem;
   color: #594d45;
 }
-
 
 /* Input */
 .home-container input[type="text"] {
@@ -69,7 +68,6 @@
   line-height: 1.5;
 }
 
-
 /* Checklist container */
 .checklist-box {
   display: flex;
@@ -81,20 +79,14 @@
 /* Each row block */
 .row-block {
   border-top: 1px solid #eee;
-  padding-top: 0.75rem; /* was 1rem */
+  padding-top: 0.75rem;
   margin-top: 0.75rem;
 }
-
 
 /* Row label + checkbox */
 .row-checkbox input[type="checkbox"] {
   margin-right: 0.5rem;
-  transform: scale(1.1); /* was 1.2 */
-}
-
-.row-checkbox input[type="checkbox"] {
   transform: scale(1.1);
-  margin: 0;
 }
 
 /* Row steps */
@@ -102,10 +94,9 @@
   padding-left: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem; /* was 0.25rem */
-  line-height: 1.4; /* was 1.5 or 1.6 */
+  gap: 0.15rem;
+  line-height: 1.4;
 }
-
 
 /* Step lines */
 .step-line {
@@ -119,12 +110,15 @@
   font-weight: bold;
   margin-right: 0.5rem;
 }
+
+/* Meta lines + preview spacing */
 .meta-line {
   margin: 0.25rem 0;
   font-size: 0.95rem;
   color: #444;
   padding-left: 0.5rem;
 }
+
 .preview-box p {
   margin: 0.25rem 0;
   font-size: 0.95rem;
@@ -143,16 +137,20 @@
   font-size: 0.95rem;
   line-height: 1.3;
 }
+
+/* Page background + layout */
 body {
   min-height: 100vh;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start; /* change to 'center' if you want vertical centering too */
+  align-items: flex-start;
   padding: 2rem;
   background-color: var(--bg-paper);
   color: var(--ink-dark);
   line-height: 1.5;
 }
+
+/* Pattern card */
 .card {
   background: #fffdfb;
   border-radius: 16px;
@@ -160,4 +158,32 @@ body {
   padding: 2rem;
   margin-top: 2rem;
   transition: all 0.3s ease;
+}
+
+/* New additions for structured output */
+.preview-box h2,
+.preview-box h3 {
+  margin-top: 1.5rem;
+  color: #6b4b3e;
+  font-weight: bold;
+  font-family: 'Georgia', serif;
+}
+
+.preview-box a {
+  color: #7b5d44;
+  text-decoration: underline;
+}
+
+.preview-box a:hover {
+  text-decoration: none;
+}
+
+.preview-box ul {
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.preview-box li {
+  margin-bottom: 0.4rem;
+  line-height: 1.5;
 }

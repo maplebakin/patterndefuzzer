@@ -1,6 +1,6 @@
 import express from 'express';
-import { scrapeGarnstudio } from './scrapeGarnstudio.js';
-import { scrapeAllFreeCrochet } from './scrapeAllFreeCrochet.js';
+import { scrapeGarnstudio } from './backend/scrapers/scrapeGarnstudio.js';
+import { scrapeAllFreeCrochet } from './backend/scrapers/scrapeAllFreeCrochet.js';
 import { scrapeZamiguz } from './scrapeZamiguz.js';
 
 const router = express.Router();

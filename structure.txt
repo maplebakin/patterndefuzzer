@@ -8,9 +8,11 @@
 │   ├── package.json
 │   ├── package-lock.json
 │   ├── routes
+│   │   └── patternRoutes.js
 │   ├── scrapers
 │   │   ├── scrapeAllFreeCrochet.js
 │   │   ├── scrapeGarnstudio.js
+│   │   ├── scrapeGarnstudioPuppeteer.js
 │   │   └── scrapeZamiguz.js
 │   └── utils
 │       └── formatPatternOutput.js
@@ -27,15 +29,17 @@
 │   │   ├── App.css
 │   │   ├── App.jsx
 │   │   ├── assets
+│   │   ├── global.css
 │   │   ├── index.css
 │   │   ├── main.jsx
 │   │   └── pages
+│   │       ├── Home.css
 │   │       └── Home.jsx
 │   └── vite.config.js
-├── index.js
+├── .gitignore
 ├── package.json
 ├── package-lock.json
 ├── routes.js
 └── structure.txt
 
-10 directories, 28 files
+10 directories, 32 files
