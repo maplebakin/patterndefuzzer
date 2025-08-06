@@ -44,3 +44,4 @@ ${cleanSteps}
 
 ${assembly?.trim() || 'Not specified.'}`;
 }
+export default formatPatternOutput;
