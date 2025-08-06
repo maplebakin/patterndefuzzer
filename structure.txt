@@ -28,10 +28,12 @@
 │   ├── src
 │   │   ├── App.css
 │   │   ├── App.jsx
+                (main layout and routing logic)
 │   │   ├── assets
 │   │   ├── global.css
 │   │   ├── index.css
 │   │   ├── main.jsx
+                (entry point for React app)
 │   │   └── pages
 │   │       ├── Home.css
 │   │       └── Home.jsx
