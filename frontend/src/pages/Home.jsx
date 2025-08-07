@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../global.css";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -42,68 +43,45 @@ export default function Home() {
   };
 
   return (
-    <div style={{ maxWidth: 680, margin: "2rem auto", color: "#eee" }}>
-      <h2>Pattern Defuzzer (Stateless MVP)</h2>
-      <p>
-        Paste a pattern link below and click <strong>Defuzz</strong>.<br/>
-        The formatted pattern will appear below for you to copy and use as you wish.
-      </p>
-      <input
-        type="text"
-        value={url}
-        onChange={e => setUrl(e.target.value)}
-        placeholder="Paste pattern URL here"
-        style={{ width: "90%", padding: 10, borderRadius: 6, marginBottom: 10 }}
-      />
-      <button
-        onClick={handleScrape}
-        disabled={loading || !url.trim()}
-        style={{
-          background: "#78e6d6",
-          color: "#222",
-          padding: "8px 18px",
-          borderRadius: 6,
-          marginLeft: 12,
-          fontWeight: 600,
-        }}
-      >
-        {loading ? "Defuzzing..." : "Defuzz"}
-      </button>
+    <div className="home-wrapper">
+      <div className="intro-card">
+        <h1 className="app-title">🧶 Pattern Defuzzer</h1>
+        <p className="home-subtext">
+          Paste a pattern link below and click <strong>Defuzz</strong>.
+          <br />
+          The formatted pattern will appear below for you to copy and use as you wish.
+        </p>
 
-      {error && <div style={{ color: "salmon", margin: "1rem 0" }}>{error}</div>}
+        <input
+          type="text"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Paste pattern URL here"
+          className="input-url"
+        />
+        <button
+          onClick={handleScrape}
+          disabled={loading || !url.trim()}
+          className="defuzz-button"
+        >
+          {loading ? "Defuzzing..." : "Defuzz"}
+        </button>
+
+        {error && <div className="error-text">{error}</div>}
+
+        <div className="footer-warning">
+          ⚠️ For personal use only. Always check pattern permissions and support the original designer.
+        </div>
+      </div>
 
       {output && (
-        <div style={{ margin: "2rem 0", background: "#232323", padding: 24, borderRadius: 10 }}>
-          <button
-            onClick={handleCopy}
-            style={{
-              background: "#78e6d6",
-              color: "#222",
-              border: "none",
-              borderRadius: 6,
-              padding: "4px 12px",
-              fontWeight: 600,
-              marginBottom: 10,
-            }}
-          >
+        <div className="pattern-card">
+          <button className="copy-button" onClick={handleCopy}>
             {copied ? "Copied!" : "Copy to Clipboard"}
           </button>
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              fontFamily: "inherit",
-              fontSize: "1.1rem",
-              marginTop: 16,
-            }}
-          >
-            {output}
-          </pre>
+          <pre className="pattern-output">{output}</pre>
         </div>
       )}
-
-      <div style={{ marginTop: 32, fontSize: 14, color: "#aaa" }}>
-        ⚠️ For personal use only. Always check pattern permissions and support the original designer.
-      </div>
     </div>
   );
 }

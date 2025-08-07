@@ -1,4 +1,6 @@
 import puppeteer from 'puppeteer';
+import parseGarnstudioInstructions from '../utils/parseGarnstudioInstructions.js';
+import formatInstructionsToSteps from '../utils/formatInstructionsToSteps.js';
 
 export async function scrapeGarnstudioPuppeteer(url) {
   const browser = await puppeteer.launch({
@@ -36,7 +38,6 @@ export async function scrapeGarnstudioPuppeteer(url) {
     );
     let instructions = patternBlock?.innerText.trim() || '';
 
-    // CLEANUP: filter out non-pattern junk lines and legend explanations
     const excludePatterns = [
       /^Pattern\s*$/, /^Videos/i, /^Lessons/i, /^FAQ/i, /^Comments/i, /^Change language/i,
       /^DROPS design/i, /^#/, /^Yarn group/i, /^Alternative Yarn/i,
@@ -54,8 +55,8 @@ export async function scrapeGarnstudioPuppeteer(url) {
       /^.*\bconvert\b.*$/i, /^.*\bcalculator\b.*$/i, /^.*\bchart\b.*$/i,
       /^.*\boverview\b.*$/i, /^.*\bbottom up\b.*$/i, /^.*\bfasten off\b.*$/i,
       /^.*\bdiagram\b.*$/i,
-      /^$/, // remove empty lines
-      /^-{2,}$/ // remove lines with just dashes
+      /^$/, // empty lines
+      /^-{2,}$/ // divider lines
     ];
 
     instructions = instructions
@@ -67,7 +68,7 @@ export async function scrapeGarnstudioPuppeteer(url) {
       )
       .join('\n');
 
-    // Try to extract yarn from the instructions if missing
+    // Try to extract yarn if missing
     if (yarn === 'Not specified') {
       const yarnMatch = instructions.match(/^\d[\d\- ]+g colour.*$/im) ||
                         instructions.match(/^.*yarn.*$/im) ||
@@ -75,14 +76,13 @@ export async function scrapeGarnstudioPuppeteer(url) {
       if (yarnMatch) yarn = yarnMatch[0];
     }
 
-    // IMPROVED hook size extraction (now always returns hookSize)
+    // Try to extract hook size if missing
     if (hookSize === 'Not specified') {
       const lines = instructions.split('\n');
       let hookMatch = lines.find(line =>
         /hook/i.test(line) && /\d+(?:\.\d+)?\s?mm/i.test(line)
       );
       if (hookMatch) {
-        // Extract "5 mm" (or similar) from the line, or use the whole line as fallback
         const mmMatch = hookMatch.match(/(\d+(?:\.\d+)?)\s?mm/i);
         hookSize = mmMatch ? `Hook size ${mmMatch[1]} mm` : hookMatch.trim();
       }
@@ -94,23 +94,18 @@ export async function scrapeGarnstudioPuppeteer(url) {
       .filter(line => line !== yarn && line !== hookSize)
       .join('\n');
 
-    // Replace repeated divider lines with one pretty divider
     instructions = instructions.replace(/(-{5,}\n?)+/g, '━━━━━━━━━━━━━━━━━━━━━━\n');
-
-    // Remove trailing legend lines (starting with '=')
     instructions = instructions.replace(/(^= .*\n?)+$/gm, '').trim();
 
     const isKnitting =
       instructions.toLowerCase().includes('knit') ||
       instructions.toLowerCase().includes('stockinette');
 
-    // Pattern images
     const images = Array.from(document.querySelectorAll('.pattern-img img')).map((img) => ({
       url: img.src,
       alt: img.alt || '',
     }));
 
-    // Language links
     const languages = Array.from(document.querySelectorAll('#language-selector a')).map((a) => ({
       language: a.innerText.trim(),
       url: a.href,
@@ -121,21 +116,8 @@ export async function scrapeGarnstudioPuppeteer(url) {
       language,
       yarn,
       hookSize,
-      gauge: 'Not specified',
-      sizes: 'Not specified',
-      difficulty: 'Not specified',
       instructions,
-      categorized: {
-        setup: [],
-        mainInstructions: instructions
-          ? instructions.split('\n').filter((line) => line.trim().length > 0)
-          : [],
-        assembly: [],
-        notes: [],
-        abbreviations: [],
-      },
       images,
-      relatedPatterns: [],
       languages,
       source: window.location.href,
       scrapedAt: dateScraped,
@@ -149,8 +131,21 @@ export async function scrapeGarnstudioPuppeteer(url) {
     return null;
   }
 
-  const { isKnitting, ...finalResult } = result;
-  return finalResult; // hookSize is now guaranteed!
+  // 🧩 Parse instructions into structured fields
+  const parsedSections = parseGarnstudioInstructions(result.instructions);
+
+  // 🔢 Format them into step arrays
+  const backSteps = formatInstructionsToSteps(parsedSections.backPiece);
+  const frontSteps = formatInstructionsToSteps(parsedSections.frontPiece);
+  const assemblySteps = formatInstructionsToSteps(parsedSections.assembly);
+
+  return {
+    ...result,
+    ...parsedSections,
+    backSteps,
+    frontSteps,
+    assemblySteps,
+  };
 }
 
 export default scrapeGarnstudioPuppeteer;
