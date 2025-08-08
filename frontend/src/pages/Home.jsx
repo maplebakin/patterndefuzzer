@@ -1,45 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "../global.css";
+
+const isLikelyUrl = (str) => {
+  try {
+    const u = new URL(str.trim());
+    return !!u.protocol && !!u.hostname;
+  } catch {
+    return false;
+  }
+};
 
 export default function Home() {
   const [url, setUrl] = useState("");
-  const [output, setOutput] = useState(null);
+  const [result, setResult] = useState(null); // { formatted, sourceUrl, cached? }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const abortRef = useRef(null);
 
   const handleScrape = async () => {
+    if (!isLikelyUrl(url)) {
+      setError("Please paste a valid URL (include http/https).");
+      return;
+    }
+
     setLoading(true);
     setError("");
-    setOutput(null);
+    setResult(null);
     setCopied(false);
 
     try {
+      if (abortRef.current) abortRef.current.abort();
+      abortRef.current = new AbortController();
+
       const res = await fetch("/api/patterns/scrape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
+        signal: abortRef.current.signal,
       });
+
       const data = await res.json();
 
-      if (data.success) {
-        setOutput(data.data.formatted);
+      if (!res.ok) {
+        setError(data?.message || "Something went wrong while defuzzing.");
+      } else if (data?.success && data?.data?.formatted) {
+        setResult({
+          formatted: data.data.formatted,
+          sourceUrl: data.data?.sourceUrl || url,
+          cached: !!data.cached,
+        });
       } else {
-        setError(data.message || "Unknown error occurred.");
+        setError(data?.message || "Unknown error occurred.");
       }
     } catch (err) {
-      setError("Failed to connect to server.");
+      if (err?.name !== "AbortError") {
+        setError("Failed to connect to server. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  const handleCopy = () => {
-    if (output) {
-      navigator.clipboard.writeText(output);
+  const handleCopy = async () => {
+    if (!result?.formatted) return;
+    try {
+      await navigator.clipboard.writeText(result.formatted);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setError("Couldn’t copy to clipboard. You can select and copy manually.");
     }
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter" && !loading) handleScrape();
   };
 
   return (
@@ -47,39 +82,67 @@ export default function Home() {
       <div className="intro-card">
         <h1 className="app-title">🧶 Pattern Defuzzer</h1>
         <p className="home-subtext">
-          Paste a pattern link below and click <strong>Defuzz</strong>.
-          <br />
-          The formatted pattern will appear below for you to copy and use as you wish.
+          Paste a pattern link below and click <strong>Defuzz</strong>.<br />
+          We’ll format a clean, readable summary with a link back to the source.
         </p>
 
         <input
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Paste pattern URL here"
+          onKeyDown={onKeyDown}
+          placeholder="https://www.garnstudio.com/pattern.php?id=..."
           className="input-url"
+          aria-label="Pattern URL"
         />
+
         <button
           onClick={handleScrape}
           disabled={loading || !url.trim()}
           className="defuzz-button"
         >
-          {loading ? "Defuzzing..." : "Defuzz"}
+          {loading ? "Defuzzing…" : "Defuzz"}
         </button>
 
-        {error && <div className="error-text">{error}</div>}
+        {loading && (
+          <div className="loading-box">
+            <div className="spinner" aria-hidden="true" />
+            <div>
+              Working on it… this may take <strong>10–20 seconds</strong> on some sites.
+            </div>
+          </div>
+        )}
+
+        {error && <div className="error-text">⚠️ {error}</div>}
 
         <div className="footer-warning">
-          ⚠️ For personal use only. Always check pattern permissions and support the original designer.
+          ⚠️ For personal reference only. Please visit and support the original designer.
         </div>
       </div>
 
-      {output && (
+      {result?.formatted && (
         <div className="pattern-card">
-          <button className="copy-button" onClick={handleCopy}>
-            {copied ? "Copied!" : "Copy to Clipboard"}
-          </button>
-          <pre className="pattern-output">{output}</pre>
+          <div className="pattern-toolbar">
+            <a
+              className="source-link"
+              href={result.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              title="Open original pattern (new tab)"
+            >
+              Visit original ↗
+            </a>
+
+            <button className="copy-button" onClick={handleCopy}>
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+
+          {result.cached && (
+            <div className="cached-note">Served from cache for speed.</div>
+          )}
+
+          <pre className="pattern-output">{result.formatted}</pre>
         </div>
       )}
     </div>

@@ -10,7 +10,13 @@ export default function parseGarnstudioInstructions(rawText = '') {
     assembly: ''
   };
 
-  const lines = rawText.split('\n').map((line) => line.trim());
+  if (!rawText || typeof rawText !== 'string') return sections;
+
+  const lines = rawText
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+
   let current = '';
   const buffer = {
     backPiece: [],
@@ -22,41 +28,56 @@ export default function parseGarnstudioInstructions(rawText = '') {
   for (let line of lines) {
     const lower = line.toLowerCase();
 
-    if (/^back piece[:]?$/i.test(line)) {
+    // --- Robust section heading detection ---
+    if (/^back\s*piece\s*[:\-]?$/i.test(line)) {
       current = 'backPiece';
       continue;
-    } else if (/^front piece[:]?$/i.test(line)) {
+    }
+    if (/^front\s*piece\s*[:\-]?$/i.test(line)) {
       current = 'frontPiece';
       continue;
-    } else if (/assembly instructions[:]?$/i.test(line) || /^assembly[:]?$/i.test(line)) {
+    }
+    if (/^(assembly\s*instructions?|finishing)\s*[:\-]?$/i.test(line)) {
       current = 'assembly';
       continue;
     }
 
-    // Smart content classification if section label is missing
-    if (/^turn and work|^work.*shoulder|^continue to work|^skip.*chain/i.test(lower)) {
+    // --- Smart guessing when heading is missing ---
+    if (
+      !current &&
+      /turn and work|continue.*shoulder|work until armhole|begin with chain/i.test(lower)
+    ) {
       current = 'backPiece';
-    } else if (/^begin the same way|^cut and fasten|^repeat for opposite/i.test(lower)) {
+    } else if (
+      !current &&
+      /begin the same way|repeat for opposite|make 2 alike/i.test(lower)
+    ) {
       current = 'frontPiece';
-    } else if (/^sew|^fasten off|^cut and fasten/i.test(lower)) {
+    } else if (
+      !current &&
+      /sew|join with|fasten off|weave in ends|block the piece/i.test(lower)
+    ) {
       current = 'assembly';
     }
 
-    // Push to detected buffer
+    // --- Add line to appropriate buffer ---
     if (['backPiece', 'frontPiece', 'assembly'].includes(current)) {
       buffer[current].push(line);
     } else {
-      buffer.tips.push(line); // fallback if it doesn’t match anything
+      // Avoid adding garbage like size charts or yarn codes to tips
+      if (!/^\d+\s*g\b/i.test(line) && !/^size\b/i.test(lower)) {
+        buffer.tips.push(line);
+      }
     }
   }
 
-  // Flatten buffers
+  // --- Assign cleaned results ---
   sections.backPiece = buffer.backPiece.join('\n').trim();
   sections.frontPiece = buffer.frontPiece.join('\n').trim();
   sections.assembly = buffer.assembly.join('\n').trim();
 
-  // Tips fallback gets pushed as tips array
-  sections.tips = buffer.tips.filter(Boolean);
+  // Deduplicate & clean tips
+  sections.tips = [...new Set(buffer.tips.map(t => t.trim()))].filter(Boolean);
 
   return sections;
 }
